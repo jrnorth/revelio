@@ -14,10 +14,16 @@ const {
 import { useState, Fragment } from 'react'
 import SearchFormEditor from './editor'
 import { QueryType } from '../query-builder/types'
+import { QueryBuilderProps } from '../query-builder/query-builder'
 import Snackbar from '@material-ui/core/Snackbar'
 import SnackbarContent from '@material-ui/core/SnackbarContent'
 import Box from '@material-ui/core/Box'
 import { defaultFilter } from '../query-builder/filter/filter-utils'
+import QueryBuilder from '../query-builder/query-builder'
+
+const queryBuilder = (props: QueryBuilderProps) => {
+  return <QueryBuilder form={props.form} onChange={props.onChange} />
+}
 
 type SearchFormProps = {
   onDelete: (form: QueryType) => void
@@ -27,6 +33,7 @@ type SearchFormProps = {
 
 const SearchForm = (props: SearchFormProps) => {
   const [editing, setEditing] = useState(false)
+  const [form, setForm] = useState(props.form)
   const onCancel = () => setEditing(false)
   const onSave = (form: QueryType) => {
     setEditing(false)
@@ -38,7 +45,12 @@ const SearchForm = (props: SearchFormProps) => {
         <Dialog fullWidth maxWidth={false} open onClose={onCancel}>
           <Box height="calc(100vh - 128px)">
             <SearchFormEditor
-              form={props.form}
+              queryBuilder={queryBuilder({
+                form,
+                onChange: form => setForm(form),
+              })}
+              title={'Search Form Editor'}
+              query={form}
               onCancel={onCancel}
               onSave={onSave}
             />
@@ -59,8 +71,15 @@ type AddProps = {
   onCreate: (form: QueryType) => void
 }
 
+const defaultForm: QueryType = {
+  filterTree: {
+    type: 'AND',
+    filters: [{ ...defaultFilter }],
+  },
+}
 const AddSearchForm = (props: AddProps) => {
   const [editing, setEditing] = useState(false)
+  const [form, setForm] = useState(defaultForm)
   const onCancel = () => setEditing(false)
   const onSave = (form: QueryType) => {
     setEditing(false)
@@ -72,12 +91,12 @@ const AddSearchForm = (props: AddProps) => {
         <Dialog fullWidth maxWidth={false} open onClose={onCancel}>
           <Box height="calc(100vh - 128px)">
             <SearchFormEditor
-              form={{
-                filterTree: {
-                  type: 'AND',
-                  filters: [{ ...defaultFilter }],
-                },
-              }}
+              queryBuilder={queryBuilder({
+                form,
+                onChange: form => setForm(form),
+              })}
+              title={'Search Form Editor'}
+              query={form}
               onCancel={onCancel}
               onSave={onSave}
             />

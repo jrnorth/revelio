@@ -11,7 +11,6 @@ import LinearProgress from '@material-ui/core/LinearProgress'
 import Typography from '@material-ui/core/Typography'
 import useAttributeDefinitions from '../react-hooks/use-attribute-definitions'
 
-import QueryBuilder from '../query-builder/query-builder'
 import { AttributeDefinition, QueryType } from '../query-builder/types'
 
 const { useQueryExecutor, useApolloFallback } = require('../react-hooks')
@@ -86,15 +85,17 @@ const Footer = (props: FooterProps) => {
 
 type EditorProps = {
   attributeDefinitions?: AttributeDefinition[]
-  form?: QueryType
+  title?: String
+  query?: QueryType
   onCancel: () => void
-  onSave: (form: QueryType) => void
+  onSave: (query: QueryType) => void
   onSearch: (query: any) => void
+  queryBuilder: React.ReactElement
   results?: Array<any>
 }
 
-const searchFormToSearch = (form: QueryType) => {
-  const { sources: srcs, sorts, detail_level, filterTree } = form
+const queryToSearch = (query: QueryType) => {
+  const { sources: srcs, sorts, detail_level, filterTree } = query
   return {
     filterTree,
     srcs: srcs || ['ddf.distribution'],
@@ -109,11 +110,16 @@ const searchFormToSearch = (form: QueryType) => {
   }
 }
 
-export const SearchFormEditor = (props: EditorProps) => {
-  const [searchForm, setSearchForm] = useState(props.form || {})
+export const QueryEditor = (props: EditorProps) => {
+  const query = props.query || {}
+  const queryBuilder = props.attributeDefinitions
+    ? React.cloneElement(props.queryBuilder, {
+        attributeDefinitions: props.attributeDefinitions,
+      })
+    : props.queryBuilder
 
   const onSearch = () => {
-    props.onSearch(searchFormToSearch(searchForm))
+    props.onSearch(queryToSearch(query))
   }
 
   return (
@@ -124,23 +130,17 @@ export const SearchFormEditor = (props: EditorProps) => {
         style={{ padding: 20 }}
         color="textPrimary"
       >
-        Search Form Editor
+        {props.title || 'Query Editor'}
       </Typography>
       <Divider />
       <Box width="100%" display="flex" flexDirection="row" height="100%">
         <Box style={{ height: `calc(100% - 60px)`, width: 500 }}>
-          <QueryBuilder
-            attributeDefinitions={props.attributeDefinitions}
-            form={searchForm}
-            onChange={form => {
-              setSearchForm(form)
-            }}
-          />
+          {queryBuilder}
           <Divider style={{ marginTop: '5px' }} />
           <Box width="100%" height="50px">
             <Footer
               onSave={() => {
-                props.onSave(searchForm)
+                props.onSave(query)
               }}
               onCancel={props.onCancel}
               onSearch={onSearch}
@@ -168,9 +168,7 @@ const AttributeDefinitionsContainer = (props: EditorProps) => {
     return <Error message={error} />
   }
 
-  return (
-    <SearchFormEditor {...props} attributeDefinitions={attributeDefinitions} />
-  )
+  return <QueryEditor {...props} attributeDefinitions={attributeDefinitions} />
 }
 
 const useDummyExecutor = () => {
@@ -186,7 +184,7 @@ export default (props: any) => {
   const { results, onSearch } = fn()
   const Component = useApolloFallback(
     AttributeDefinitionsContainer,
-    SearchFormEditor
+    QueryEditor
   )
   return <Component {...props} results={results} onSearch={onSearch} />
 }

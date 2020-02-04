@@ -13,7 +13,7 @@ import Divider from '@material-ui/core/Divider'
 import Filter from './filter/individual-filter'
 import QuerySettings from './query-settings'
 
-type QueryBuilderProps = {
+export type QueryBuilderProps = {
   attributeDefinitions?: AttributeDefinition[]
   onChange: (form: QueryType) => void
   form?: QueryType
