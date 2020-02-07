@@ -21,8 +21,16 @@ import useSearchRouting, { DetailsLink } from './search-routing'
 const LoadingComponent = () => <LinearProgress />
 
 const metacardQuery = gql`
-  query TextQuery($filter: Json!, $settings: QuerySettingsInput) {
-    metacards(filterTree: $filter, settings: $settings) {
+  query TextQuery(
+    $expression: String!
+    $extraFilters: [Json]
+    $settings: QuerySettingsInput
+  ) {
+    metacardsByNaturalLanguage(
+      expression: $expression
+      extraFilters: $extraFilters
+      settings: $settings
+    ) {
       attributes {
         id
         description
@@ -135,33 +143,24 @@ const ResultsView = props => {
   return isImageType ? <Gallery {...props} /> : <ResultTable {...props} />
 }
 
-const getQueryFilter = props => {
-  const { query = '', isImageType = false } = props
-
-  const filter = {
-    type: 'AND',
-    filters: [{ type: 'ILIKE', property: 'anyText', value: query }],
-  }
-
-  if (isImageType) {
-    filter.filters.push({
-      type: '=',
-      property: 'media.type',
-      value: 'image/jpeg',
-    })
-  }
-
-  return filter
-}
-
 const Results = () => {
   const { handleRoute, query, type, startIndex, pageSize } = useSearchRouting()
 
   const isImageType = type === 'image'
+  const extraFilters = isImageType
+    ? [
+        {
+          type: '=',
+          property: 'media.type',
+          value: 'image/jpeg',
+        },
+      ]
+    : []
 
   const { loading, error, data, refetch } = useQuery(metacardQuery, {
     variables: {
-      filter: getQueryFilter({ query, isImageType }),
+      expression: query,
+      extraFilters,
       settings: {
         pageSize,
         startIndex,
@@ -181,7 +180,7 @@ const Results = () => {
     )
   }
 
-  const { attributes, status } = data.metacards
+  const { attributes, status } = data.metacardsByNaturalLanguage
 
   const pagingProps = {
     total: status.hits,

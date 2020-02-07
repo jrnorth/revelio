@@ -4,7 +4,7 @@
   "main": "src/main/webapp/main.js",
   "license": "MIT",
   "devDependencies": {
-    "@connexta/ace": "https://github.com/connexta/ace.git#81e7b8b22b3f7e43b356ba5dfbc065ffdb694892",
+    "@connexta/ace": "https://github.com/connexta/ace.git#d3294c2a70532dee1fdb01513fb86cd7f9685a28",
     "@types/ol": "^5.3.6",
     "@types/react": "^16.9.5",
     "@types/react-loadable": "^5.5.3",
@@ -19,7 +19,6 @@
     "json-diff": "^0.5.4",
     "mocha": "^5.2.0",
     "ndjson": "^1.5.0",
-    "node-fetch": "^2.6.0",
     "tempfile": "^3.0.0",
     "typescript": "^3.6.4"
   },
@@ -52,6 +51,7 @@
     "lodash.throttle": "^4.1.1",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.16",
+    "node-fetch": "^2.6.0",
     "ol": "^6.0.1",
     "on-finished": "^2.3.0",
     "polished": "^3.4.1",

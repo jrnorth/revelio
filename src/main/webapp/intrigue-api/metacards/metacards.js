@@ -112,6 +112,7 @@ const typeDefs = `
 
     metacardsByTag(tag: String!, settings: QuerySettingsInput): QueryResponse
     metacardsById(ids: [ID]!, settings: QuerySettingsInput): [QueryResponse]
+    metacardsByNaturalLanguage(expression: String!, extraFilters: [Json], settings: QuerySettingsInput): QueryResponse
 
     # Get known values for a given attribute.
     #
@@ -321,6 +322,17 @@ const metacardsById = async (parent, args, context) => {
   )
 }
 
+const metacardsByNaturalLanguage = async (parent, args, context) => {
+  const res = await context.nodeFetch(
+    'http://localhost:7000/filterTree?q=' + encodeURIComponent(args.expression)
+  )
+  const filterTree = await res.json()
+  const extraFilters = args.extraFilters || []
+  extraFilters.forEach(f => filterTree.filters.push(f))
+  // TODO need to handle unsuccessful fetches
+  return metacards(parent, { ...args, filterTree }, context)
+}
+
 const facet = async (parent, args, { catalog }) => {
   const { attribute } = args
 
@@ -427,6 +439,7 @@ const resolvers = {
     metacards,
     metacardsByTag,
     metacardsById,
+    metacardsByNaturalLanguage,
     facet,
   },
   Mutation: {

@@ -6,6 +6,8 @@ import fetch from './fetch'
 import withChaos from './chaos'
 import Cookies from 'universal-cookie'
 
+const nodeFetch = require('node-fetch')
+
 const withExceptionLogger = (fn, logger) => async (...args) => {
   try {
     return await fn(...args)
@@ -131,6 +133,7 @@ const context = args => {
 
   return {
     fetch: withFetchLogger(wrappedFetch, req.logger),
+    nodeFetch: nodeFetch.default,
     ...generateRpcMethods(rpc),
   }
 }
