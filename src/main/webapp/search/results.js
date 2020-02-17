@@ -111,6 +111,9 @@ const ResultTable = ({ results }) => {
                   <Typography>{result.title}</Typography>
                 </DetailsLink>
               </TableCell>
+              <TableCell>
+                <Typography>{result.description}</Typography>
+              </TableCell>
             </TableRow>
           )
         })}
